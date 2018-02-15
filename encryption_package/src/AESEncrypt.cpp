@@ -109,7 +109,7 @@ class AESEncryptFactory : public ScalarFunctionFactory
     {
         argTypes.addVarchar();
         argTypes.addVarchar();
-        returnType.addVarchar();
+        returnType.addVarbinary();
     }
 
     virtual void getReturnType(ServerInterface &srvInterface,
@@ -119,7 +119,7 @@ class AESEncryptFactory : public ScalarFunctionFactory
         const VerticaType &t = argTypes.getColumnType(0);
 	// I chose to just round up to the next block size because
 	// I believe it's faster than computing the length and round. 
-        returnType.addVarchar(t.getStringLength()+AES_BLOCK_SIZE);
+        returnType.addVarbinary(t.getStringLength()+AES_BLOCK_SIZE);
     }
 };
 
