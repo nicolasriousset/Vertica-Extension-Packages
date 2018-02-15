@@ -105,7 +105,7 @@ class AESDecryptFactory : public ScalarFunctionFactory
                               ColumnTypes &argTypes,
                               ColumnTypes &returnType)
     {
-        argTypes.addVarchar();
+        argTypes.addVarbinary();
         argTypes.addVarchar();
         returnType.addVarchar();
     }
@@ -127,4 +127,5 @@ public:
 };
 
 RegisterFactory(AESDecryptFactory);
+
 
