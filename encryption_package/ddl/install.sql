@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION AESEncrypt as language 'C++' name 'AESEncryptFactory'
 GRANT EXECUTE ON FUNCTION AESEncrypt(varchar, varchar) TO PUBLIC;
 
 CREATE OR REPLACE FUNCTION AESDecrypt as language 'C++' name 'AESDecryptFactory' library Encryption;
-GRANT EXECUTE ON FUNCTION AESDecrypt(varchar, varchar) TO PUBLIC;
+GRANT EXECUTE ON FUNCTION AESDecrypt(varbinary, varchar) TO PUBLIC;
 
 
 
