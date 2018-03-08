@@ -59,38 +59,45 @@ public:
 
         // While we have inputs to process
         do {
-	    char *t;
-	    unsigned int l;
-	    int r=0;
-            std::string inStr = arg_reader.getStringRef(0).str();
-	    std::string kStr = arg_reader.getStringRef(1).str();
+            char *t;
+            unsigned int l;
+            int r=0;
+            
+            if (!arg_reader.isNull(0)) {
+                std::string inStr = arg_reader.getStringRef(0).str();
+                std::string kStr = arg_reader.getStringRef(1).str();
 
-	    l=inStr.capacity(); // warning, this might be a hack
-	    l=inStr.length(); // warning, this might be a hack
+                l=inStr.capacity(); // warning, this might be a hack
+                l=inStr.length(); // warning, this might be a hack
 
-	    t=(char *)malloc(l+1); // add one for the null.
-	    memset(t,0,l+1);
-	    
-	    r=my_aes_decrypt(inStr.c_str(),l,t,kStr.c_str(),kStr.length());
+                t=(char *)malloc(l+1); // add one for the null.
+                memset(t,0,l+1);
+        
+                r=my_aes_decrypt(inStr.c_str(),l,t,kStr.c_str(),kStr.length());
 
-	    // Few debug loggers
-            //srvInterface.log("AESDecrypt: InLen: ->%d<-",l);
-            //srvInterface.log("AESDecrypt: Input: ->%s<-",inStr.c_str());
-            //srvInterface.log("AESDecrypt: Outpt: ->%s<-",t);
-            //srvInterface.log("AESDecrypt: OutLn: ->%d<-",r);
+                // Few debug loggers
+                //srvInterface.log("AESDecrypt: InLen: ->%d<-",l);
+                //srvInterface.log("AESDecrypt: Input: ->%s<-",inStr.c_str());
+                //srvInterface.log("AESDecrypt: Outpt: ->%s<-",t);
+                //srvInterface.log("AESDecrypt: OutLn: ->%d<-",r);
 
-	    if (r < 0) {
-		srvInterface.log("AESDecrypt: Error decrypting: %d",r);
-		return;
-	    }
-	    // We try to preserve the input string in it's entirety before encrypting it, this includes
-	    // nulls. So the decrypted string should already be null terminated. But you never know. So we tack 
-	    // one on the end anyway.
-	    t[r+1]=0;
-	    res_writer.getStringRef().copy(t,r);
-	    free(t);
-	    res_writer.next();
-	    
+                if (r < 0) {
+                    srvInterface.log("AESDecrypt: Error decrypting: %d",r);
+                    return;
+                }
+        
+                // We try to preserve the input string in it's entirety before encrypting it, this includes
+                // nulls. So the decrypted string should already be null terminated. But you never know. So we tack 
+                // one on the end anyway.
+                t[r+1]=0;
+                res_writer.getStringRef().copy(t,r);
+                free(t);
+            } else {
+                res_writer.getStringRef().setNull();
+			}
+            
+            res_writer.next();
+            
         } while (arg_reader.next());
     }
 };
@@ -99,7 +106,9 @@ class AESDecryptFactory : public ScalarFunctionFactory
 {
     // return an instance of RemoveSpace to perform the actual addition.
     virtual ScalarFunction *createScalarFunction(ServerInterface &interface)
-    { return vt_createFuncObj(interface.allocator, AESDecrypt); }
+    { 
+        return vt_createFuncObj(interface.allocator, AESDecrypt); 
+    }
 
     virtual void getPrototype(ServerInterface &interface,
                               ColumnTypes &argTypes,
@@ -117,7 +126,7 @@ class AESDecryptFactory : public ScalarFunctionFactory
         const VerticaType &t = argTypes.getColumnType(0);
         returnType.addVarchar(t.getStringLength());
     }
-	
+    
 public:
     AESDecryptFactory() 
     {
@@ -127,5 +136,6 @@ public:
 };
 
 RegisterFactory(AESDecryptFactory);
+
 
 
